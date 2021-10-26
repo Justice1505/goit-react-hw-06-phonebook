@@ -1,55 +1,21 @@
-import React from 'react';
+import React from "react";
+import { useSelector } from "react-redux";
+import { getFilterList } from "../../Redux/phonebook/phonebook-selectors";
+import ContactItem from "./ContactItem";
+import s from "./ContactList.module.css";
 
-import { connect } from 'react-redux';
-import { removeContact } from '../../Redux/phonebook/phonebook-actions';
-import PropTypes from 'prop-types';
-import s from './ContactList.module.css';
-
-const ContactList = ({ filtered, removeContact, contactsList }) => {
-  const onFindContact = (filtered, contactsList) => {
-    return contactsList.filter(contact =>
-      contact.name.toLowerCase().includes(filtered.toLowerCase()),
-    );
-  };
-  const findContact = onFindContact(filtered, contactsList);
+const ContactsList = () => {
+  const filterList = useSelector(getFilterList);
 
   return (
-    <ul>
-      {findContact &&
-        findContact.map(contact => {
-          return (
-            <li className={s.item} key={contact.id}>
-              <span className={s.span}>{contact.name}:</span>
-              &nbsp;
-              <span className={s.span}>{contact.number}</span>
-              <button
-                className={s.btn}
-                type="button"
-                id={contact.id}
-                onClick={() => removeContact(contact.id)}
-              >
-                Delete
-              </button>
-            </li>
-          );
-        })}
-    </ul>
+    <>
+      <ul className={s.list}>
+        {filterList.map(({ name, number, id }) => (
+          <ContactItem key={id} name={name} number={number} id={id} />
+        ))}
+      </ul>
+    </>
   );
 };
 
-const mapStateToProps = state => ({
-  filtered: state.contacts.filter,
-  contactsList: state.contacts.items,
-});
-
-const mapDispatchToProps = {
-  removeContact,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ContactList);
-
-ContactList.propTypes = {
-  filtered: PropTypes.string.isRequired,
-  removeContact: PropTypes.func.isRequired,
-  contactsList: PropTypes.array.isRequired,
-};
+export default ContactsList;

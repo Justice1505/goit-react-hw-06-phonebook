@@ -1,24 +1,28 @@
-import { combineReducers } from 'redux';
-import { createReducer } from '@reduxjs/toolkit';
+import { createReducer } from "@reduxjs/toolkit";
 import {
-  addNewContact,
-  getAllContacts,
-  removeContact,
-  findContact,
-} from './phonebook-actions';
+  addToPhonebook,
+  removeFromPhonebook,
+  filterPhonebook,
+} from "./phonebook-actions";
+import { generate } from "shortid";
+import { combineReducers } from "redux";
 
-const items = createReducer([], {
-  [addNewContact]: (state, action) => [...state, action.payload],
-  [getAllContacts]: (state, action) => action.payload,
-  [removeContact]: (state, action) =>
-    state.filter(contact => contact.id !== action.payload),
+const itemsReducer = createReducer([], {
+  [addToPhonebook]: (store, { payload }) => {
+    const newContact = { ...payload, id: generate() };
+    store.push(newContact);
+  },
+  [removeFromPhonebook]: (store, { payload }) => {
+    const idx = store.findIndex(({ id }) => id === payload);
+    store.splice(idx, 1);
+  },
 });
 
-const filter = createReducer('', {
-  [findContact]: (_, action) => action.payload,
+const filterReducer = createReducer("", {
+  [filterPhonebook]: (_, { payload }) => payload,
 });
 
 export default combineReducers({
-  items,
-  filter,
+  items: itemsReducer,
+  filter: filterReducer,
 });
